@@ -39,6 +39,8 @@ dependencies:
   firebase_auth: ^4.4.2
   google_sign_in: ^6.1.0
   percent_indicator: ^4.2.3
+  scroll_date_picker: ^3.7.0
+  calendar_date_picker2: ^0.5.2
 
 dev_dependencies:
   flutter_test:
