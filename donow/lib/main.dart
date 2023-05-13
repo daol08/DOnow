@@ -5,6 +5,8 @@ import 'package:google_sign_in/google_sign_in.dart';
 import './style.dart';
 import 'firebase_options.dart';
 import './goalList.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import './sign_controller.dart';
 
 Future<void> main() async {
   runApp(const MyApp());
@@ -13,6 +15,8 @@ Future<void> main() async {
   );
 }
 
+FirebaseFirestore firestore = FirebaseFirestore.instance;
+
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
@@ -20,10 +24,6 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
       home: const MyHomePage(title: 'Flutter Demo Home Page'),
     );
   }
@@ -39,28 +39,6 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  Future<UserCredential> signInWithGoogle() async {
-    // Trigger the authentication flow
-    final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
-
-    // Obtain the auth details from the request
-    final GoogleSignInAuthentication? googleAuth =
-        await googleUser?.authentication;
-
-    // Create a new credential
-    final credential = GoogleAuthProvider.credential(
-      accessToken: googleAuth?.accessToken,
-      idToken: googleAuth?.idToken,
-    );
-    if (googleUser != null) {
-      Navigator.push(
-          context, MaterialPageRoute(builder: (context) => goalList()));
-    }
-
-    // Once signed in, return the UserCredential
-    return await FirebaseAuth.instance.signInWithCredential(credential);
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -97,7 +75,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 child: OutlinedButton(
                     //this is for google log in
                     onPressed: () => {
-                          signInWithGoogle(),
+                          signInWithGoogle(context),
                         },
                     style: OutlinedButton.styleFrom(
                       side: BorderSide(width: 2.0, color: button_color),

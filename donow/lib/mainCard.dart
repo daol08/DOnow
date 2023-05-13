@@ -1,9 +1,11 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import './style.dart';
 import 'package:percent_indicator/percent_indicator.dart';
 import './goalDetail.dart';
 
-Widget MainCard(context) {
+Widget MainCard(context, title, Timestamp date) {
+  String _date = DateTime.now().difference(date.toDate()).inDays.toString();
   return Card(
     elevation: 0,
     shape: const RoundedRectangleBorder(
@@ -19,18 +21,18 @@ Widget MainCard(context) {
       },
       child: Column(
         children: [
-          const Padding(
+          Padding(
             padding: EdgeInsets.only(top: 8.0),
             child: Center(
                 child: Text(
-              '한국사 시험준비',
+              '\u{2728} $title',
               style: TextStyle(color: font_color, fontSize: 30),
             )),
           ),
-          const Padding(
+          Padding(
             padding: EdgeInsets.all(6.0),
             child: Text(
-              'D-7',
+              'D$_date',
               style: TextStyle(color: font_color, fontSize: 30),
             ),
           ),

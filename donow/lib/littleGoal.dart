@@ -37,15 +37,15 @@ class _LittleGoalState extends State<littleGoal> {
         children: [
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Padding(
+            children: const [
+              Padding(
                 padding: EdgeInsets.only(top: 8.0, left: 10),
                 child: Text(
                   '책 한권',
                   style: TextStyle(color: font_color, fontSize: 20),
                 ),
               ),
-              const Padding(
+              Padding(
                 padding: EdgeInsets.only(top: 8.0, left: 10, bottom: 8),
                 //this is for date
                 child: Text(

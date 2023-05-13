@@ -1,7 +1,11 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:donow/main.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:scroll_date_picker/scroll_date_picker.dart';
 import './style.dart';
 import './mainCard.dart';
+import './sign_controller.dart';
 
 class goalList extends StatefulWidget {
   @override
@@ -71,7 +75,9 @@ class _GoalListState extends State<goalList> {
                     width: 200,
                     height: 250,
                     child: ScrollDatePicker(
-                      selectedDate: _selectedDate,
+                      minimumDate: DateTime.now().subtract(Duration(days: 365)),
+                      maximumDate: DateTime.now().add(Duration(days: 700)),
+                      selectedDate: DateTime.now(),
                       locale: Locale('ko'),
                       onDateTimeChanged: (DateTime value) {
                         setState(() {
@@ -99,6 +105,12 @@ class _GoalListState extends State<goalList> {
                               Text("Add", style: TextStyle(color: font_color)),
                           onPressed: () {
                             new_goal_title = _textFieldController.text;
+                            firestore.collection('goal').add({
+                              'user': user_email,
+                              'title': new_goal_title,
+                              'date': Timestamp.fromDate(_selectedDate)
+                            });
+
                             print(new_goal_title);
                             print(_selectedDate);
                             Navigator.pop(context);
@@ -114,11 +126,6 @@ class _GoalListState extends State<goalList> {
 
   @override
   Widget build(BuildContext context) {
-    final List<Widget> _items = [
-      MainCard(context),
-      MainCard(context),
-      MainCard(context)
-    ];
     return MaterialApp(
       home: Scaffold(
           body: Column(
@@ -136,7 +143,7 @@ class _GoalListState extends State<goalList> {
                 Padding(
                   padding: const EdgeInsets.only(left: 30.0),
                   child: Text(
-                    '$_title',
+                    '\u{1F44A} $_title',
                     style: TextStyle(color: font_color, fontSize: 30),
                   ),
                 ),
@@ -153,11 +160,96 @@ class _GoalListState extends State<goalList> {
           ),
           Expanded(
             flex: 6,
-            child: ListView.builder(
-                itemCount: _items.length,
-                itemBuilder: (context, index) {
-                  return Dismissible(
-                      key: Key(index.toString()), child: _items[index]);
+            child: StreamBuilder<QuerySnapshot>(
+                stream: firestore
+                    .collection('goal')
+                    .where('user', isEqualTo: user_email)
+                    .snapshots(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return CircularProgressIndicator();
+                  }
+                  return ListView.builder(
+                    itemCount: snapshot.data!.docs.length,
+                    itemBuilder: (context, index) {
+                      return Dismissible(
+                        key: Key(snapshot.toString()),
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: MainCard(
+                            context,
+                            snapshot.data!.docs[index]['title'],
+                            snapshot.data!.docs[index]['date'],
+                          ),
+                        ),
+                        confirmDismiss: (direction) {
+                          if (direction == DismissDirection.endToStart) {
+                            return showDialog(
+                                context: context,
+                                builder: (context) {
+                                  return AlertDialog(
+                                    title: Text("삭제하시겠습니까?"),
+                                    actions: [
+                                      OutlinedButton(
+                                          child: Text("취소",
+                                              style:
+                                                  TextStyle(color: font_color)),
+                                          onPressed: () {
+                                            Navigator.pop(context);
+                                          },
+                                          style: OutlinedButton.styleFrom(
+                                              side: BorderSide(
+                                                  width: 1.0,
+                                                  color: button_color))),
+                                      MaterialButton(
+                                          color: main_background_color,
+                                          textColor: font_color,
+                                          child: Text("삭제",
+                                              style:
+                                                  TextStyle(color: font_color)),
+                                          onPressed: () {
+                                            //삭제
+                                            Navigator.pop(context);
+                                          }),
+                                    ],
+                                  );
+                                });
+                          } else {
+                            return showDialog(
+                                context: context,
+                                builder: (context) {
+                                  return AlertDialog(
+                                    title: Text("삭제하시겠습니까?"),
+                                    actions: [
+                                      OutlinedButton(
+                                          child: Text("취소",
+                                              style:
+                                                  TextStyle(color: font_color)),
+                                          onPressed: () {
+                                            Navigator.pop(context);
+                                          },
+                                          style: OutlinedButton.styleFrom(
+                                              side: BorderSide(
+                                                  width: 1.0,
+                                                  color: button_color))),
+                                      MaterialButton(
+                                          color: main_background_color,
+                                          textColor: font_color,
+                                          child: Text("삭제",
+                                              style:
+                                                  TextStyle(color: font_color)),
+                                          onPressed: () {
+                                            //삭제
+                                            Navigator.pop(context);
+                                          }),
+                                    ],
+                                  );
+                                });
+                          }
+                        },
+                      );
+                    },
+                  );
                 }),
           ),
           Padding(
