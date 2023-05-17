@@ -4,12 +4,16 @@ import 'package:percent_indicator/percent_indicator.dart';
 import './goalDetail.dart';
 
 class littleGoal extends StatefulWidget {
+  final bool finish_check;
+  final String little_title;
+
+  const littleGoal(
+      {super.key, required this.little_title, required this.finish_check});
   @override
   _LittleGoalState createState() => _LittleGoalState();
 }
 
 class _LittleGoalState extends State<littleGoal> {
-  bool isChecked = false;
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
@@ -37,31 +41,23 @@ class _LittleGoalState extends State<littleGoal> {
         children: [
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
-            children: const [
+            children: [
               Padding(
                 padding: EdgeInsets.only(top: 8.0, left: 10),
                 child: Text(
-                  '책 한권',
+                  '${widget.little_title}',
                   style: TextStyle(color: font_color, fontSize: 20),
-                ),
-              ),
-              Padding(
-                padding: EdgeInsets.only(top: 8.0, left: 10, bottom: 8),
-                //this is for date
-                child: Text(
-                  '23.04.05-23.05.30',
-                  style: TextStyle(color: font_color, fontSize: 15),
                 ),
               ),
             ],
           ),
           Checkbox(
             checkColor: Colors.white,
-            value: isChecked,
+            value: widget.finish_check,
             fillColor: MaterialStateProperty.resolveWith(getColor),
             onChanged: (bool? value) {
               setState(() {
-                isChecked = value!;
+                //check state change!!!
               });
             },
           ),

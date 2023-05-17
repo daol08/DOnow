@@ -1,10 +1,23 @@
 import 'package:calendar_date_picker2/calendar_date_picker2.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:donow/main.dart';
 import 'package:flutter/material.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
+import 'package:scroll_date_picker/scroll_date_picker.dart';
 import './style.dart';
 import 'littleGoal.dart';
 
 class goalDetail extends StatefulWidget {
+  final String goal_title;
+  final String id;
+  final String dday;
+  // ignore: non_constant_identifier_names
+  const goalDetail(
+      {super.key,
+      required this.goal_title,
+      required this.id,
+      required this.dday});
+
   @override
   _GoalDetailState createState() => _GoalDetailState();
 }
@@ -63,6 +76,14 @@ class _GoalDetailState extends State<goalDetail> {
                           child:
                               Text("Add", style: TextStyle(color: font_color)),
                           onPressed: () {
+                            firestore
+                                .collection("goal")
+                                .doc(widget.id)
+                                .collection("little_goal")
+                                .add({
+                              'little_title': _textFieldController.text,
+                              'finish_check': false
+                            });
                             print(_rangeDateValue[0]);
                             print(_rangeDateValue[1]);
                             Navigator.pop(context);
@@ -111,7 +132,7 @@ class _GoalDetailState extends State<goalDetail> {
                       iconSize: 40,
                     ),
                     Text(
-                      'Detail Goal name!',
+                      '${widget.goal_title}',
                       style: TextStyle(color: font_color, fontSize: 30),
                     ),
                   ],
@@ -135,29 +156,76 @@ class _GoalDetailState extends State<goalDetail> {
                 flex: 1,
                 child: Center(
                   child: Text(
-                      style: TextStyle(color: font_color, fontSize: 50), "D-7"),
+                      style: TextStyle(color: font_color, fontSize: 50),
+                      "D ${widget.dday}"),
                 ),
               ),
               Expanded(
-                flex: 6,
-                child: ListView(
-                  padding: const EdgeInsets.all(20),
-                  children: [
-                    littleGoal(),
-                    Container(
-                      child: OutlinedButton(
-                          //this is for add goal card!
-                          onPressed: _show_modal,
-                          child: Text(
-                            "+",
-                            style: TextStyle(color: font_color),
-                          ),
-                          style: OutlinedButton.styleFrom(
-                            backgroundColor: Colors.white,
-                            side: BorderSide(width: 1.0, color: button_color),
-                          )),
-                    ),
-                  ],
+                flex: 4,
+                child: StreamBuilder<QuerySnapshot>(
+                  stream: firestore
+                      .collection("goal")
+                      .doc(widget.id)
+                      .collection("little_goal")
+                      .snapshots(),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const CircularProgressIndicator();
+                    }
+                    return ListView.builder(
+                        itemCount: snapshot.data!.docs.length,
+                        itemBuilder: (context, index) {
+                          if (index <= snapshot.data!.docs.length) {
+                            return Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 8),
+                              child: littleGoal(
+                                little_title: snapshot.data!.docs[index]
+                                    ['little_title'],
+                                finish_check: snapshot.data!.docs[index]
+                                    ['finish_check'],
+                              ),
+                            );
+                          }
+                        });
+                  },
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(bottom: 8.0),
+                child: Center(
+                  child: Container(
+                    width: width * 0.9,
+                    child: OutlinedButton(
+                        //this is for add goal card!
+                        onPressed: _show_modal,
+                        child: Text(
+                          "+",
+                          style: TextStyle(color: font_color),
+                        ),
+                        style: OutlinedButton.styleFrom(
+                          backgroundColor: Colors.white,
+                          side: BorderSide(width: 1.0, color: button_color),
+                        )),
+                  ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(bottom: 15.0),
+                child: Center(
+                  child: Container(
+                    width: width * 0.9,
+                    child: OutlinedButton(
+                        //this is for add goal card!
+                        onPressed: () {},
+                        child: Text(
+                          "완료 \u{1F389}",
+                          style: TextStyle(color: font_color, fontSize: 20),
+                        ),
+                        style: OutlinedButton.styleFrom(
+                          backgroundColor: main_background_color,
+                        )),
+                  ),
                 ),
               ),
             ],

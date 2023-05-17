@@ -177,10 +177,10 @@ class _GoalListState extends State<goalList> {
                         child: Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: MainCard(
-                            context,
-                            snapshot.data!.docs[index]['title'],
-                            snapshot.data!.docs[index]['date'],
-                          ),
+                              context,
+                              snapshot.data!.docs[index]['title'],
+                              snapshot.data!.docs[index]['date'],
+                              snapshot.data!.docs[index].id),
                         ),
                         confirmDismiss: (direction) {
                           if (direction == DismissDirection.endToStart) {
@@ -209,6 +209,11 @@ class _GoalListState extends State<goalList> {
                                                   TextStyle(color: font_color)),
                                           onPressed: () {
                                             //삭제
+                                            firestore
+                                                .collection('goal')
+                                                .doc(snapshot
+                                                    .data!.docs[index].id)
+                                                .delete();
                                             Navigator.pop(context);
                                           }),
                                     ],
@@ -253,7 +258,7 @@ class _GoalListState extends State<goalList> {
                 }),
           ),
           Padding(
-            padding: const EdgeInsets.only(bottom: 10.0),
+            padding: const EdgeInsets.only(bottom: 15.0),
             child: Container(
               child: OutlinedButton(
                   //this is for add goal card!

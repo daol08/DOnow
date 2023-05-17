@@ -4,7 +4,7 @@ import './style.dart';
 import 'package:percent_indicator/percent_indicator.dart';
 import './goalDetail.dart';
 
-Widget MainCard(context, title, Timestamp date) {
+Widget MainCard(context, title, Timestamp date, id) {
   String _date = DateTime.now().difference(date.toDate()).inDays.toString();
   return Card(
     elevation: 0,
@@ -17,7 +17,10 @@ Widget MainCard(context, title, Timestamp date) {
         //to specific goal page!
         debugPrint('Card tapped.');
         Navigator.push(
-            context, MaterialPageRoute(builder: (context) => goalDetail()));
+            context,
+            MaterialPageRoute(
+                builder: (context) =>
+                    goalDetail(goal_title: title, id: id, dday: _date)));
       },
       child: Column(
         children: [
