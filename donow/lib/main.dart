@@ -47,9 +47,9 @@ class _MyHomePageState extends State<MyHomePage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Container(
-              child: Center(
+              child: const Center(
                 child: Column(
-                  children: const [
+                  children: [
                     Padding(
                       padding: EdgeInsets.all(20.0),
                       child: Text(
